@@ -23,49 +23,44 @@ class Database:
         connection.close()
         return data
 
-    def create_table_items(self):
+    def create_table_users(self):
         sql = """
-        CREATE TABLE Items(
+        CREATE TABLE Users(
         id INT NOT NULL,
-        name TEXT,
-        amount INT,
+        phone TEXT,
         PRIMARY KEY (id)
         );
         """
         self.execute(sql, commit=True)
 
-    def add_item(self, id: int, name: str = None, amount: int = 0):
-        sql = 'INSERT INTO Items(id, name, amount) VALUES(?, ?, ?)'
-        parameters = (id, name, amount)
+    def add_user(self, id: int, phone: str = None):
+        sql = 'INSERT INTO Users(id, phone) VALUES(?, ?)'
+        parameters = (id, phone)
         self.execute(sql, parameters, commit=True)
 
-    def select_item_info(self, **kwargs) -> list:
-        sql = 'SELECT * FROM Items WHERE '
+    def select_user_info(self, **kwargs) -> list:
+        sql = 'SELECT * FROM Users WHERE '
         sql, parameters = self.format_args(sql, kwargs)
         return self.execute(sql, parameters, fetchall=True)
 
-    def select_all_items(self) -> list:
-        sql = 'SELECT * FROM Items'
+    def select_all_users(self) -> list:
+        sql = 'SELECT * FROM Users'
         return self.execute(sql, fetchall=True)
 
-    def update_item_name(self, id: int, name: str):
-        sql = 'UPDATE Items SET name = ? WHERE id = ?'
-        return self.execute(sql, parametrs=(name, id), commit=True)
+    def update_user_phone(self, id: int, phone: str):
+        sql = 'UPDATE Users SET phone = ? WHERE id = ?'
+        return self.execute(sql, parametrs=(phone, id), commit=True)
 
-    def update_item_amount(self, id: int, amount: int):
-        sql = 'UPDATE Items SET amount = ? WHERE id = ?'
-        return self.execute(sql, parametrs=(amount, id), commit=True)
-
-    def delete_item(self, **kwargs):
-        sql = 'DELETE FROM Items WHERE '
+    def delete_user(self, **kwargs):
+        sql = 'DELETE FROM Users WHERE '
         sql, parameters = self.format_args(sql, parameters=kwargs)
         return self.execute(sql, parametrs=parameters, commit=True)
 
     def delete_all(self):
-        self.execute('DELETE FROM Items WHERE True', commit=True)
+        self.execute('DELETE FROM Users WHERE True', commit=True)
 
     def drop_all(self):
-        self.execute('DROP TABLE Items', commit=True)
+        self.execute('DROP TABLE Users', commit=True)
 
     @staticmethod
     def format_args(sql, parameters: dict) -> tuple:

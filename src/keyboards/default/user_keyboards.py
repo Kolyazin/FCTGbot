@@ -3,7 +3,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 commands_default_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text='/start'),
+            KeyboardButton(text='/list'),
             KeyboardButton(text='/item')
         ],
         [
