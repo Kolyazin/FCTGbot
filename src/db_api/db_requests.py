@@ -28,15 +28,20 @@ class Database:
         CREATE TABLE Items(
         id INT NOT NULL,
         name TEXT,
-        amount INT,
+        count INT,
+        photo_path TEXT,
         PRIMARY KEY (id)
         );
         """
         self.execute(sql, commit=True)
+        self.add_item(1, 'Огурец', 10, r'db_api/database/product_photo/cucumber.jpeg')
+        self.add_item(2, 'Лук', 3, r'db_api/database/product_photo/onion.jpeg')
+        self.add_item(3, 'Морковь', 14, r'db_api/database/product_photo/carrot.jpeg')
+        self.add_item(4, 'Свекла', 6, r'db_api/database/product_photo/beet.jpeg')
 
-    def add_item(self, id: int, name: str = None, amount: int = 0):
-        sql = 'INSERT INTO Items(id, name, amount) VALUES(?, ?, ?)'
-        parameters = (id, name, amount)
+    def add_item(self, id: int, name: str = None, count: int = 0, photo_path: str = ''):
+        sql = 'INSERT INTO Items(id, name, count, photo_path) VALUES(?, ?, ?, ?)'
+        parameters = (id, name, count, photo_path)
         self.execute(sql, parameters, commit=True)
 
     def select_item_info(self, **kwargs) -> list:
@@ -52,9 +57,13 @@ class Database:
         sql = 'UPDATE Items SET name = ? WHERE id = ?'
         return self.execute(sql, parametrs=(name, id), commit=True)
 
-    def update_item_amount(self, id: int, amount: int):
-        sql = 'UPDATE Items SET amount = ? WHERE id = ?'
-        return self.execute(sql, parametrs=(amount, id), commit=True)
+    def update_item_count(self, id: int, count: int):
+        sql = 'UPDATE Items SET count = ? WHERE id = ?'
+        return self.execute(sql, parametrs=(count, id), commit=True)
+
+    def get_items_count(self) -> int:
+        sql = 'SELECT * FROM Items'
+        return len(self.execute(sql, fetchall=True))
 
     def delete_item(self, **kwargs):
         sql = 'DELETE FROM Items WHERE '

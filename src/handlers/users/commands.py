@@ -1,8 +1,9 @@
 from aiogram import types
+from aiogram.types import InputFile, InputMediaPhoto
 from config import commands_list
 from loader import dp
-from keyboards import commands_default_keyboard
-from loader import db
+from keyboards import commands_default_keyboard, get_item_inline_keyboard, navigation_items_callback
+from loader import db, bot
 
 
 # функция для обработки команд, список команд строится из списка ключей словаря
@@ -26,11 +27,40 @@ async def del_item(message: types.Message):
     await message.answer(text='Товар удален.')
 
 
+# @dp.message_handler(commands=['item'])
+# async def item(message: types.Message):
+#     data = message.text.split(' ')
+#     info = db.select_item_info(id=int(data[1]))
+#     await message.answer(text=f'ID: {info[0][0]}\nНазвание: {info[0][1]}\nКоличество: {info[0][2]}')
+@dp.message_handler(text=['Список товаров'])
 @dp.message_handler(commands=['item'])
-async def item(message: types.Message):
-    data = message.text.split(' ')
-    info = db.select_item_info(id=int(data[1]))
-    await message.answer(text=f'ID: {info[0][0]}\nНазвание: {info[0][1]}\nКоличество: {info[0][2]}')
+async def answer_menu_command(message: types.Message):
+    first_item_info = db.select_item_info(id=1)
+    first_item_info = first_item_info[0]
+    _, name, count, photo_path = first_item_info
+    item_text = f"Название товара: {name}" \
+                f"\nКоличество товара: {count}"
+    photo = InputFile(path_or_bytesio=photo_path)
+    await message.answer_photo(photo=photo,
+                               caption=item_text,
+                               reply_markup=get_item_inline_keyboard())
+
+
+@dp.callback_query_handler(navigation_items_callback.filter(for_data='items'))
+async def see_new_items(call: types.CallbackQuery):
+    print(call)
+    current_item_id = int(call.data.split(':')[-1])
+    first_item_info = db.select_item_info(id=current_item_id)
+    first_item_info = first_item_info[0]
+    _, name, count, photo_path = first_item_info
+    item_text = f"Название товара: {name}" \
+                f"\nКоличество товара: {count}"
+    photo = InputFile(path_or_bytesio=photo_path)
+    await bot.edit_message_media(media=InputMediaPhoto(media=photo,
+                                                       caption=item_text),
+                                 chat_id=call.message.chat.id,
+                                 message_id=call.message.message_id,
+                                 reply_markup=get_item_inline_keyboard(id=current_item_id))
 
 
 @dp.message_handler(commands=['menu'])
