@@ -7,6 +7,7 @@ from loader import db, bot
 
 
 # функция для обработки команд, список команд строится из списка ключей словаря
+@dp.message_handler(text='Список товаров')
 @dp.message_handler(commands=['list'])
 async def cmds(message: types.Message):
     # ответ берется из словаря в соответствии с принятой командой
@@ -32,7 +33,7 @@ async def del_item(message: types.Message):
 #     data = message.text.split(' ')
 #     info = db.select_item_info(id=int(data[1]))
 #     await message.answer(text=f'ID: {info[0][0]}\nНазвание: {info[0][1]}\nКоличество: {info[0][2]}')
-@dp.message_handler(text=['Список товаров'])
+@dp.message_handler(text=['Каталог'])
 @dp.message_handler(commands=['item'])
 async def answer_menu_command(message: types.Message):
     first_item_info = db.select_item_info(id=1)
@@ -48,7 +49,6 @@ async def answer_menu_command(message: types.Message):
 
 @dp.callback_query_handler(navigation_items_callback.filter(for_data='items'))
 async def see_new_items(call: types.CallbackQuery):
-    print(call)
     current_item_id = int(call.data.split(':')[-1])
     first_item_info = db.select_item_info(id=current_item_id)
     first_item_info = first_item_info[0]
@@ -75,8 +75,29 @@ async def help(message: types.Message):
         '/list - показать список товаров\n' \
         '/add - добавить товар (/add id name amount)\n' \
         '/del - удалить товар (/del id)\n' \
-        '/item - показать информацию о товаре (/item id)\n'
+        '/item - показать каталог\n'
     )
+
+
+@dp.message_handler(text='Скрыть клавиатуру')
+async def hide_keyboard(message: types.Message):
+    await message.answer(text='Ok', reply_markup=types.ReplyKeyboardRemove())
+
+
+@dp.callback_query_handler(navigation_items_callback.filter(for_data='buy'))
+async def buy(call: types.CallbackQuery):
+    current_item_id = int(call.data.split(':')[-1])
+    first_item_info = db.select_item_info(id=current_item_id)
+    first_item_info = first_item_info[0]
+    _, name, count, photo_path = first_item_info
+    item_text = f"{current_item_id}, {name}, {count}"
+    await call.message.answer(text=item_text)
+
+
+@dp.callback_query_handler(navigation_items_callback.filter(for_data='bucket'))
+async def busket(call: types.CallbackQuery):
+    await call.message.answer(text='Корзина')
+
 
 # @dp.message_handler(content_types=['contact'])
 # async def answer_contact_command(message: types.Message):
