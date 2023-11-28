@@ -3,8 +3,12 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 commands_default_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text='/list'),
-            KeyboardButton(text='/item')
+            KeyboardButton(text='Список товаров'),
+            KeyboardButton(text='Каталог')
+        ],
+        [
+            KeyboardButton(text='Корзина'),
+            KeyboardButton(text='Купить')
         ],
         [
             KeyboardButton(text='/help'),
