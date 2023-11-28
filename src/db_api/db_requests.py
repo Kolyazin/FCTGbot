@@ -80,3 +80,41 @@ class Database:
     def format_args(sql, parameters: dict) -> tuple:
         sql += ' AND '.join([f'{item} = ?' for item in parameters])
         return sql, tuple(parameters.values())
+
+    def create_table_bucket(self):
+        sql = """
+        CREATE TABLE Bucket(
+        user_id INT NOT NULL,
+        bucket TEXT,
+        PRIMARY KEY (user_id)
+        );
+        """
+        self.execute(sql, commit=True)
+
+    def select_users_bucket(self, user_id: int) -> str:
+        sql = 'SELECT * FROM Bucket WHERE user_id = ?'
+        return self.execute(sql, parametrs=(user_id,), fetchall=True)
+
+    def add_item_to_bucket(self, user_id: int, item_id: int):
+        print(f'user_id {user_id}, item_id {item_id}')
+        items = self.select_users_bucket(user_id)
+        print(items)
+        if len(items) == 0:
+            sql = 'INSERT INTO Bucket(user_id, bucket) VALUES(?, ?)'
+            items = f'{item_id}'
+            print(f'user_id {user_id}, items {items}')
+            parametrs=(user_id, items)
+            self.execute(sql, parametrs, commit=True)
+        else:
+            items = items[0]
+            _, items = items
+            sql = 'UPDATE Bucket SET bucket = ? WHERE user_id = ?'
+            items = f'{items} {item_id}'
+            print(f'items {items}')
+            self.execute(sql, parametrs=(items, user_id), commit=True)
+
+    def delete_buckets(self):
+        self.execute('DELETE FROM Bucket WHERE True', commit=True)
+
+    def drop_bucket(self):
+        self.execute('DROP TABLE Bucket', commit=True)

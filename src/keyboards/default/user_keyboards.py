@@ -7,7 +7,7 @@ commands_default_keyboard = ReplyKeyboardMarkup(
             KeyboardButton(text='Каталог')
         ],
         [
-            KeyboardButton(text='В корзину'),
+            KeyboardButton(text='Корзина'),
             KeyboardButton(text='Купить')
         ],
         [

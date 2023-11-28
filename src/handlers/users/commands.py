@@ -94,9 +94,19 @@ async def buy(call: types.CallbackQuery):
     await call.message.answer(text=item_text)
 
 
-@dp.callback_query_handler(navigation_items_callback.filter(for_data='bucket'))
-async def busket(call: types.CallbackQuery):
-    await call.message.answer(text='Корзина')
+@dp.callback_query_handler(navigation_items_callback.filter(for_data='to_bucket'))
+async def bucket(call: types.CallbackQuery):
+    current_item_id = int(call.data.split(':')[-1])
+    first_item_info = db.select_item_info(id=current_item_id)
+    first_item_info = first_item_info[0]
+    _, name, count, photo_path = first_item_info
+    db.add_item_to_bucket(call.from_user.id, current_item_id)
+    await call.message.answer(text='В корзине')
+
+
+@dp.message_handler(text='Корзина')
+async def bucket(message: types.Message):
+    await message.answer(text=db.select_users_bucket(message.from_user.id))
 
 
 # @dp.message_handler(content_types=['contact'])

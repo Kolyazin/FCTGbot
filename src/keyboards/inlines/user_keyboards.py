@@ -37,7 +37,7 @@ def get_item_inline_keyboard(id: int = 1) -> InlineKeyboardMarkup:
 
     btm_bucket = InlineKeyboardButton(text='В корзину',
                                       callback_data=navigation_items_callback.new(
-                                          for_data='bucket',
+                                          for_data='to_bucket',
                                           id=id)
                                       )
     btm_buy = InlineKeyboardButton(text="Купить",
